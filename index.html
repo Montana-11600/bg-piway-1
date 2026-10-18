@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piway Clarkson</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Barlow:wght@400;500;600&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+/* Layout: logo du club fixé en fond, en-tête de dossier, grille de cartes cuir/patch à deux colonnes, lecteur audio fixé en bas. */
+:root {
+  --ink: #040403;      /* fond, identique au noir du logo */
+  --coal: #0d0d0e;
+  --iron: #171718;
+  --steel: #2c2c2e;
+  --ash: #8d8a85;
+  --bone: #cfc8bd;     /* gris-beige des patchs du logo */
+  --white: #f1eee8;
+  --flash: #ffe2b0;
+  --font-display: "Pirata One", "UnifrakturCook", Georgia, serif;
+  --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-stamp: "Special Elite", "Courier New", monospace;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--bone);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-left: var(--gutter-l);
+  padding-right: var(--gutter-r);
+  padding-block: 0 110px;
+  overflow-x: hidden;
+}
+body.locked { overflow: hidden; }
+
+/* ---------- Logo en fond ---------- */
+.bg-logo {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: var(--ink) url("logo.jpg") center / auto min(100vh, 100vw * 1.2) no-repeat;
+}
+.bg-logo::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(4,4,3,.25) 0%, rgba(4,4,3,.6) 55%, rgba(4,4,3,.93) 100%);
+}
+.grain {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .09; mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+main, header.hero, footer { position: relative; z-index: 2; }
+
+/* ---------- Écran d'entrée ---------- */
+.splash {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  background: var(--ink);
+  padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px));
+  transition: opacity .9s ease, visibility .9s;
+  text-align: center;
+}
+.splash.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash img { width: min(72vmin, 520px); height: auto; display: block; filter: drop-shadow(0 0 60px rgba(0,0,0,.9)); }
+.splash .stamp { font-family: var(--font-stamp); font-size: .8rem; letter-spacing: .28em; text-transform: uppercase; color: var(--ash); }
+.enter {
+  font-family: var(--font-display); font-size: 1.7rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--white); background: var(--coal); cursor: pointer;
+  border: 1px solid var(--steel); outline: 1px dashed rgba(207,200,189,.4); outline-offset: -7px;
+  padding: 14px 44px; border-radius: 4px;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.enter:hover, .enter:focus-visible { background: var(--bone); color: var(--ink); border-color: var(--bone); }
+.enter:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
+
+/* ---------- En-tête ---------- */
+.hero { max-width: 1080px; margin: 0 auto; padding-block: 72px 36px; text-align: center; }
+.kicker { font-family: var(--font-stamp); font-size: .82rem; letter-spacing: .26em; text-transform: uppercase; color: var(--ash); margin: 0 0 18px; }
+.hero h1 {
+  font-family: var(--font-display); font-weight: 400; margin: 0;
+  font-size: clamp(2.8rem, 9.5vw, 6.4rem); line-height: .98; color: var(--white);
+  text-wrap: balance; text-shadow: 0 4px 40px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,1);
+}
+.hero h1 em { font-style: normal; color: var(--bone); display: block; font-size: .62em; letter-spacing: .04em; margin-block: .1em; }
+.patches { display: flex; justify-content: center; align-items: center; gap: 22px; margin: 30px 0 26px; }
+.patch {
+  font-family: var(--font-display); color: var(--bone); background: var(--coal);
+  border: 1px solid var(--steel); outline: 1px dashed rgba(207,200,189,.45); outline-offset: -5px;
+  display: grid; place-items: center; line-height: 1; text-shadow: 0 2px 6px #000;
+}
+.patch.diamond { width: 64px; height: 64px; transform: rotate(45deg); font-size: 0; }
+.patch.diamond span { transform: rotate(-45deg); font-size: 1.6rem; }
+.patch.rect { height: 50px; padding: 0 16px; font-size: 1.7rem; border-radius: 4px; }
+.facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 34px; margin: 0; padding: 0; list-style: none; }
+.facts li { font-family: var(--font-stamp); font-size: .92rem; color: var(--bone); }
+.facts li b { display: block; font-weight: 400; font-size: .7rem; letter-spacing: .24em; text-transform: uppercase; color: var(--ash); }
+.hint { margin: 34px auto 0; max-width: 46ch; font-size: .95rem; color: var(--ash); text-wrap: balance; }
+.hint svg { width: 1.05em; height: 1.05em; vertical-align: -.15em; margin-right: .35em; }
+
+/* ---------- Cartes ---------- */
+.deck { max-width: 1080px; margin: 0 auto; padding-block: 24px 40px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+.card { perspective: 1600px; cursor: crosshair; min-width: 0; display: grid; }
+.card:focus-visible { outline: 2px solid var(--white); outline-offset: 6px; border-radius: 10px; }
+.card.shake { animation: shake .34s cubic-bezier(.36,.07,.19,.97); }
+@keyframes shake {
+  10%, 90% { transform: translate(-1px, 0); } 20%, 80% { transform: translate(3px, -1px); }
+  30%, 50%, 70% { transform: translate(-5px, 1px); } 40%, 60% { transform: translate(4px, 0); }
+}
+.inner { display: grid; transform-style: preserve-3d; transition: transform .95s cubic-bezier(.2,.75,.2,1); }
+.card.flipped .inner { transform: rotateY(180deg); }
+.face {
+  grid-area: 1 / 1; position: relative; overflow: hidden; min-width: 0;
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+  border-radius: 10px; border: 1px solid var(--steel);
+  box-shadow: 0 18px 40px -18px #000, inset 0 0 0 1px rgba(255,255,255,.03);
+}
+.front {
+  min-height: 300px; display: flex; flex-direction: column; justify-content: space-between; padding: 26px 26px 22px;
+  background:
+    radial-gradient(120% 90% at 20% 0%, rgba(255,255,255,.07), transparent 55%),
+    linear-gradient(160deg, #19191a, #0a0a0b 70%);
+}
+.front::before { /* couture du patch */
+  content: ""; position: absolute; inset: 9px; border: 1px dashed rgba(207,200,189,.34); border-radius: 6px; pointer-events: none;
+}
+.front::after { /* texture cuir */
+  content: ""; position: absolute; inset: 0; opacity: .16; mix-blend-mode: screen; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.2 -.15'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.num { position: absolute; right: 18px; bottom: -34px; font-family: var(--font-display); font-size: 11rem; line-height: 1; color: rgba(207,200,189,.06); pointer-events: none; user-select: none; }
+.tag { font-family: var(--font-stamp); font-size: .74rem; letter-spacing: .24em; text-transform: uppercase; color: var(--ash); position: relative; z-index: 1; }
+.front h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(2rem, 4.4vw, 2.9rem); line-height: 1.02; margin: 18px 0 8px; color: var(--white); text-wrap: balance; position: relative; z-index: 1; }
+.front p.sub { margin: 0; color: var(--ash); font-size: .95rem; max-width: 34ch; position: relative; z-index: 1; }
+.shoot { display: flex; align-items: center; gap: 10px; margin-top: 26px; font-family: var(--font-stamp); font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; color: var(--bone); position: relative; z-index: 1; }
+.shoot svg { width: 20px; height: 20px; flex: none; }
+.card:hover .front { border-color: #55534f; }
+
+.back {
+  transform: rotateY(180deg); padding: 28px 28px 24px;
+  background: linear-gradient(170deg, #1d1d1f, #101011 75%);
+  border-color: #3a3a3d;
+}
+.back::before { content: ""; position: absolute; inset: 9px; border: 1px dashed rgba(207,200,189,.16); border-radius: 6px; pointer-events: none; }
+.back .tag { display: flex; justify-content: space-between; gap: 12px; }
+.back h3 { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1.05; margin: 14px 0 14px; color: var(--white); text-wrap: balance; }
+.back p { margin: 0 0 .95em; max-width: 62ch; font-size: 1rem; color: #d9d3c9; }
+.back p:last-of-type { margin-bottom: 0; }
+.back .close { margin-top: 20px; font-family: var(--font-stamp); font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ash); }
+.back ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .65em; }
+.back li { position: relative; padding-left: 26px; color: #d9d3c9; }
+.back li::before { /* puce = impact de balle */
+  content: ""; position: absolute; left: 3px; top: .52em; width: 11px; height: 11px; border-radius: 50%;
+  background: radial-gradient(circle, #000 0 38%, #77736c 42% 62%, transparent 68%);
+}
+.back dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 9px 20px; }
+.back dt { font-family: var(--font-stamp); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ash); padding-top: .25em; }
+.back dd { margin: 0; color: var(--white); }
+.back .big { font-family: var(--font-display); font-size: 1.35rem; color: var(--white); line-height: 1.25; margin: 0 0 .7em; max-width: 30ch; }
+
+/* ---------- Impacts ---------- */
+.hole { position: absolute; width: 92px; height: 92px; margin: -46px 0 0 -46px; pointer-events: none; z-index: 5; animation: pop .22s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes pop { from { transform: scale(1.9) rotate(var(--r, 0deg)); opacity: 0; } to { transform: scale(1) rotate(var(--r, 0deg)); opacity: 1; } }
+.spark { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--flash); box-shadow: 0 0 8px 2px rgba(255,200,120,.8); pointer-events: none; z-index: 6; }
+.flash { position: fixed; inset: 0; z-index: 90; background: var(--flash); opacity: 0; pointer-events: none; }
+
+/* ---------- Conclusion et pied de page ---------- */
+.verdict { max-width: 1080px; margin: 0 auto; padding: 40px 0 20px; text-align: center; }
+.verdict .tag { display: block; margin-bottom: 16px; }
+.verdict blockquote { margin: 0 auto; max-width: 46ch; font-family: var(--font-display); font-size: clamp(1.5rem, 3.6vw, 2.2rem); line-height: 1.25; color: var(--white); text-wrap: balance; }
+.verdict p { margin: 18px auto 0; max-width: 62ch; color: var(--ash); }
+footer { max-width: 1080px; margin: 0 auto; padding-block: 30px; text-align: center; font-family: var(--font-stamp); font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; color: #67645f; border-top: 1px dashed #26262a; }
+
+/* ---------- Lecteur ---------- */
+.player {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  background: rgba(10,10,11,.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--steel);
+  padding: 12px var(--gutter-r) calc(12px + env(safe-area-inset-bottom, 0px)) var(--gutter-l);
+}
+.player .row { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
+.pbtn { flex: none; width: 46px; height: 46px; display: grid; place-items: center; cursor: pointer; color: var(--ink); background: var(--bone); border: 0; border-radius: 50%; transition: background .15s, transform .15s; }
+.pbtn:hover { background: var(--white); transform: scale(1.05); }
+.pbtn svg { width: 20px; height: 20px; }
+.ibtn { flex: none; width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer; color: var(--bone); background: transparent; border: 0; border-radius: 6px; }
+.ibtn:hover { color: var(--white); background: var(--iron); }
+.ibtn svg { width: 22px; height: 22px; }
+.pbtn:focus-visible, .ibtn:focus-visible, input[type=range]:focus-visible { outline: 2px solid var(--white); outline-offset: 2px; }
+.meta { flex: 1; min-width: 0; line-height: 1.25; }
+.meta b { display: block; font-weight: 500; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.meta span { display: block; font-size: .8rem; color: var(--ash); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eq { flex: none; display: flex; align-items: flex-end; gap: 3px; height: 22px; }
+.eq i { width: 3px; height: 4px; background: var(--bone); border-radius: 1px; }
+.playing .eq i { animation: eq 0.9s ease-in-out infinite; }
+.playing .eq i:nth-child(2) { animation-delay: -.3s; } .playing .eq i:nth-child(3) { animation-delay: -.6s; } .playing .eq i:nth-child(4) { animation-delay: -.15s; }
+@keyframes eq { 0%, 100% { height: 4px; } 50% { height: 22px; } }
+.time { flex: none; font-family: var(--font-stamp); font-size: .78rem; color: var(--ash); font-variant-numeric: tabular-nums; }
+.vol { display: flex; align-items: center; gap: 4px; flex: none; }
+input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; margin: 0; }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(to right, var(--bone) var(--p, 0%), var(--steel) var(--p, 0%)); }
+input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--steel); }
+input[type=range]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--bone); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -5px; border-radius: 50%; background: var(--white); border: 0; }
+input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--white); border: 0; }
+#vol { width: 110px; }
+.seek { position: absolute; left: 0; right: 0; top: -8px; height: 16px; width: 100%; }
+.seek::-webkit-slider-runnable-track { height: 3px; border-radius: 0; }
+.seek::-webkit-slider-thumb { width: 10px; height: 10px; margin-top: -3.5px; }
+.seek::-moz-range-track, .seek::-moz-range-progress { height: 3px; border-radius: 0; }
+.seek::-moz-range-thumb { width: 10px; height: 10px; }
+
+@media (max-width: 760px) {
+  .deck { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .hero { padding-top: 48px; }
+  .front { min-height: 250px; padding: 22px 20px 18px; }
+  .back { padding: 24px 20px 20px; }
+  .num { font-size: 8rem; }
+  .player .row { gap: 10px; }
+  .time, .eq { display: none; }
+  #vol { width: 74px; }
+  .back dl { grid-template-columns: 1fr; gap: 0; }
+  .back dd { margin-bottom: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .inner { transition-duration: .01s; }
+  .card.shake { animation: none; }
+  .hole { animation: none; }
+  .playing .eq i { animation: none; height: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-logo" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="flash" id="flash" aria-hidden="true"></div>
+
+<div class="splash" id="splash">
+  <img src="logo.jpg" alt="Southerners MC, Los Santos">
+  <div class="stamp">Dossier confidentiel</div>
+  <button class="enter" id="enter" type="button">Entrer</button>
+</div>
+
+<header class="hero">
+  <p class="kicker">Southerners MC · Los Santos · Dossier personnage</p>
+  <h1>Peyton <em>« Piway »</em> Clarkson</h1>
+  <div class="patches" aria-hidden="true">
+    <div class="patch diamond"><span>1%</span></div>
+    <div class="patch rect">MC</div>
+  </div>
+  <ul class="facts">
+    <li><b>Né le</b>14 septembre 1996</li>
+    <li><b>Ville</b>Chicago, Illinois</li>
+    <li><b>Peine purgée</b>13 ans</li>
+    <li><b>Projet</b>Wild Pro Shops</li>
+  </ul>
+  <p class="hint">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 1v6M12 17v6M1 12h6M17 12h6"/></svg>
+    Chaque carte est une pièce du dossier. Clique dessus : un coup part, la carte se retourne.
+  </p>
+</header>
+
+<main>
+  <section class="deck" id="deck" aria-label="Background du personnage"></section>
+
+  <section class="verdict" aria-label="Conclusion">
+    <span class="tag">Conclusion</span>
+    <blockquote>Un homme marqué par son passé, ses erreurs et ses 13 années derrière les barreaux.</blockquote>
+    <p>Trois piliers pour la suite : son Motorcycle Club, son indépendance professionnelle et sa maîtrise personnelle.</p>
+  </section>
+</main>
+
+<footer>Southerners MC · Los Santos — Personnage fictif, serveur GTA RP</footer>
+
+<div class="player" id="player" role="region" aria-label="Lecteur de musique">
+  <input class="seek" id="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Position dans le morceau">
+  <div class="row">
+    <button class="pbtn" id="play" type="button" aria-label="Lecture / pause"></button>
+    <div class="meta"><b id="title">Terrible Tommy</b><span id="artist">Ryan Horne</span></div>
+    <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="time" id="time">0:00 / 0:00</div>
+    <div class="vol">
+      <button class="ibtn" id="mute" type="button" aria-label="Couper le son"></button>
+      <input id="vol" type="range" min="0" max="100" value="50" step="1" aria-label="Volume">
+    </div>
+  </div>
+</div>
+
+<audio id="music" src="music.mp3" loop preload="auto"></audio>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Contenu ---------- */
+  var CARDS = [
+    { title: "Identité", sub: "Qui est Piway", kind: "id" },
+    { title: "Enfance dorée", sub: "Tout, sauf l'essentiel", body: [
+      "Peyton Clarkson, plus connu sous le surnom de « Piway », est né le 14 septembre 1996 à Chicago, dans l'Illinois. Issu d'une famille afro-américaine financièrement aisée, il grandit dans un environnement où l'argent ne manque pas. Son père travaille dans l'immobilier en tant qu'agent immobilier et sa mère occupe un poste dans le secteur bancaire. Malgré cette stabilité financière, Peyton ressent très jeune un manque important : celui de l'amour et de l'attention familiale.",
+      "Ses parents, souvent absorbés par leurs carrières respectives, lui offrent tout ce dont un enfant pourrait rêver matériellement, mais passent à côté de l'essentiel. Peyton grandit donc avec ce sentiment de solitude, développant progressivement un caractère indépendant, impulsif et particulièrement difficile à maîtriser."
+    ]},
+    { title: "Le déclic", sub: "Onze ans, une fête de quartier", body: [
+      "À l'âge de 11 ans, un événement va profondément marquer sa vie. Lors d'une fête locale, un Motorcycle Club traverse son quartier. Fasciné par le bruit des moteurs, les motos et les hommes portant fièrement leurs couleurs, Peyton s'approche du groupe. Certains membres prennent le temps de discuter avec lui et lui proposent même d'essayer leurs cuirs.",
+      "Ce jour-là, Piway découvre bien plus qu'une passion pour les deux-roues. Il découvre une véritable fraternité. Il observe la solidarité entre les membres, leur entraide, leur soutien mutuel et cette mentalité où personne n'est laissé derrière. Pour un jeune garçon qui manque cruellement d'affection familiale, cette vision représente tout ce qu'il a toujours recherché.",
+      "À partir de cet instant, Peyton sait qu'il veut appartenir à cet univers."
+    ]},
+    { title: "Une mèche courte", sub: "Passions et colère", body: [
+      "Au fil des années, sa fascination pour les bikers ne cesse de grandir. Il développe une véritable passion pour les motos, mais également pour la musculation, qui devient pour lui un moyen de se défouler et d'évacuer une partie de sa colère. Grand supporter des Chicago Bulls, il apprécie également les soirées tranquilles autour d'un bon bourbon du Kentucky.",
+      "Cependant, derrière cette apparence de passionné se cache un homme au tempérament extrêmement instable.",
+      "Peyton peut se montrer particulièrement gentil, loyal et généreux envers les personnes qu'il apprécie. Mais son impulsivité et son manque de patience peuvent rapidement transformer une situation banale en confrontation violente. Il supporte difficilement la provocation, le manque de respect et les personnes qui cherchent à lui imposer leur autorité."
+    ]},
+    { title: "La chute", sub: "Une altercation, 13 ans de condamnation", body: [
+      "Cette incapacité à contrôler ses émotions finit par lui coûter une grande partie de sa jeunesse.",
+      "Lors d'une violente altercation, Peyton perd totalement le contrôle et passe à tabac un homme, lui causant de très graves blessures au visage : fracture de la mâchoire, fracture de la pommette, fracture du nez ainsi qu'un déplacement de la cloison nasale.",
+      "Les conséquences judiciaires sont lourdes. Peyton est condamné à 13 années de prison."
+    ]},
+    { title: "Derrière les barreaux", sub: "Treize ans pour réfléchir", body: [
+      "Durant son incarcération, il est confronté à un univers où le respect, la patience et la maîtrise de soi peuvent faire toute la différence. Pourtant, malgré les années qui passent, son caractère explosif reste profondément ancré en lui.",
+      "La prison lui permet néanmoins de réfléchir à ce qu'il souhaite réellement accomplir une fois libre. Il comprend qu'il ne veut pas suivre le chemin que son père avait imaginé pour lui. Reprendre une carrière dans l'immobilier, vivre dans un bureau et construire une existence dictée par les attentes familiales ne l'intéressent absolument pas.",
+      "Ce qu'il souhaite, c'est retrouver cette sensation qu'il avait découverte à 11 ans : appartenir à une famille soudée, construire quelque chose de ses propres mains et gagner le respect de ceux qui l'entourent."
+    ]},
+    { title: "Repartir de zéro", sub: "La sortie", body: [
+      "À sa sortie de prison, après 13 longues années derrière les barreaux, Peyton décide de repartir de zéro.",
+      "Il laisse derrière lui les ambitions de ses parents et choisit de se consacrer à l'univers biker. Son objectif est de s'investir pleinement dans un Motorcycle Club, de participer à son développement et de faire de cette fraternité une véritable famille."
+    ]},
+    { title: "Wild Pro Shops", sub: "Le rêve légal", body: [
+      "Cependant, Piway ne souhaite pas uniquement vivre pour son MC. Il possède également un rêve personnel : ouvrir son propre commerce, Wild Pro Shops, un magasin spécialisé dans la vente d'articles de pêche, de chasse et de randonnée, inspiré des grandes enseignes américaines du secteur.",
+      "Pour lui, ce projet représente une possibilité de construire quelque chose de légal, de stable et de durable, sans renier ses passions ni son identité."
+    ]},
+    { title: "Son pire ennemi", sub: "Lui-même", body: [
+      "Malgré ses ambitions, Peyton reste conscient que son principal ennemi n'est pas forcément un rival ou une personne extérieure, mais bien son propre tempérament. Son impulsivité, sa violence et son manque de patience pourraient à tout moment compromettre les projets qu'il souhaite réaliser.",
+      "Aujourd'hui, Piway cherche à écrire un nouveau chapitre de son histoire, partagé entre son envie de devenir un homme respecté dans le monde biker, son ambition entrepreneuriale et son besoin de trouver enfin une véritable stabilité personnelle."
+    ]},
+    { title: "Personnalité", sub: "Loyal, explosif, fidèle à sa parole", body: [
+      "Peyton Clarkson est un homme au caractère particulièrement marqué. Extrêmement impulsif, il possède une patience très limitée et peut rapidement perdre son calme lorsqu'une situation ne se déroule pas comme il le souhaite.",
+      "Il est capable de faire preuve d'une grande gentillesse, d'une loyauté sans faille et d'un véritable esprit de solidarité envers ceux qu'il considère comme ses proches.",
+      "Cependant, cette personnalité possède également une facette beaucoup plus sombre. Lorsqu'il se sent provoqué, humilié ou menacé, Piway peut devenir extrêmement violent, parfois sans prendre le temps de réfléchir aux conséquences de ses actes. Son passage en prison n'a pas totalement effacé cette violence, mais lui a fait prendre conscience de la nécessité de travailler sur lui-même.",
+      "Il accorde énormément d'importance au respect, à la fraternité et à la parole donnée. Pour lui, la loyauté ne se négocie pas et une véritable famille ne se limite pas aux liens du sang."
+    ]},
+    { title: "Court terme", sub: "Objectifs du personnage", list: [
+      "Se faire connaître progressivement en ville et commencer à développer un réseau de contacts.",
+      "Faire grandir son CH (Club House) et entreprendre les premiers travaux nécessaires à son amélioration.",
+      "Trouver un emploi stable afin de disposer de revenus réguliers.",
+      "Mettre de l'argent de côté pour financer son futur projet professionnel.",
+      "Commencer à préparer l'ouverture de Wild Pro Shops, son magasin spécialisé dans la pêche, la chasse et la randonnée."
+    ]},
+    { title: "Moyen terme", sub: "Objectifs du personnage", list: [
+      "Apprendre à canaliser sa colère et à mieux contrôler ses réactions.",
+      "Devenir une personne plus calme et réfléchie dans ses décisions.",
+      "Commencer à rechercher un emplacement adapté pour l'ouverture de Wild Pro Shops.",
+      "Prendre contact avec le gouvernement et les autorités compétentes afin d'étudier les possibilités administratives et commerciales de son projet.",
+      "Participer activement au développement de son Motorcycle Club.",
+      "Gravir progressivement les échelons du MC afin d'obtenir une place importante et reconnue.",
+      "Développer la réputation et l'influence du club, aussi bien dans ses activités légales que dans le milieu illégal."
+    ]},
+    { title: "Long terme", sub: "Objectifs du personnage", list: [
+      "Faire de son Motorcycle Club le club le plus connu, influent et respecté de toute la ville.",
+      "Ouvrir officiellement Wild Pro Shops et en faire un commerce reconnu et réputé.",
+      "Devenir pleinement maître de ses émotions et parvenir à gérer sa colère sans recourir systématiquement à la violence.",
+      "Construire une véritable famille, trouver une stabilité sentimentale et offrir à ses proches l'amour et le soutien qui lui ont manqué durant son enfance."
+    ]},
+    { title: "Plan de secours", sub: "Si le magasin ne voit pas le jour", body: [
+      "Si son projet Wild Pro Shops ne venait finalement pas à voir le jour, Peyton envisage une seconde possibilité professionnelle : ouvrir un petit garage automobile et moto.",
+      "Contrairement aux établissements spécialisés dans la préparation de véhicules, les modifications de performances ou les customs, son garage serait principalement destiné aux prestations simples et accessibles.",
+      "Il souhaiterait proposer des réparations mécaniques légères, de l'entretien courant, du nettoyage de véhicules ainsi que des interventions rapides pour les clients de passage.",
+      "Ce commerce lui permettrait de conserver un lien avec sa passion pour les véhicules tout en développant une activité légale capable de lui assurer une stabilité financière."
+    ]}
+  ];
+  var IDENTITY = [
+    ["Nom", "Clarkson"], ["Prénom", "Peyton"], ["Surnom", "Piway"],
+    ["Naissance", "14 septembre 1996"], ["Lieu", "Chicago, Illinois, États-Unis"],
+    ["Origine", "Afro-Américain"],
+    ["Passions", "Moto, musculation, NBA, pêche, chasse et randonnée"],
+    ["Équipe favorite", "Chicago Bulls"],
+    ["Alcool favori", "Whisky bourbon américain, originaire des États-Unis, particulièrement du Kentucky"]
+  ];
+
+  /* ---------- Construction des cartes ---------- */
+  var deck = document.getElementById("deck");
+  var TOTAL = CARDS.length;
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  var CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><path d="M12 1.5v5M12 17.5v5M1.5 12h5M17.5 12h5"/></svg>';
+
+  CARDS.forEach(function (c, i) {
+    var n = pad(i + 1), inner;
+    if (c.kind === "id") {
+      inner = "<dl>" + IDENTITY.map(function (r) { return "<dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd>"; }).join("") + "</dl>";
+    } else if (c.list) {
+      inner = "<ul>" + c.list.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
+    } else {
+      inner = c.body.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("");
+    }
+    var el = document.createElement("div");
+    el.className = "card";
+    el.tabIndex = 0;
+    el.setAttribute("role", "button");
+    el.setAttribute("aria-expanded", "false");
+    el.setAttribute("aria-label", c.title + " : ouvrir la carte");
+    el.innerHTML =
+      '<div class="inner">' +
+        '<div class="face front">' +
+          '<span class="num" aria-hidden="true">' + n + '</span>' +
+          '<span class="tag">Pièce ' + n + ' / ' + pad(TOTAL) + '</span>' +
+          '<div><h2>' + esc(c.title) + '</h2><p class="sub">' + esc(c.sub) + '</p></div>' +
+          '<span class="shoot">' + CROSS + 'Tirer pour ouvrir</span>' +
+        '</div>' +
+        '<div class="face back">' +
+          '<span class="tag"><span>Pièce ' + n + ' / ' + pad(TOTAL) + '</span><span>' + esc(c.sub) + '</span></span>' +
+          '<h3>' + esc(c.title) + '</h3>' + inner +
+          '<div class="close">Tirer pour refermer</div>' +
+        '</div>' +
+      '</div>';
+    deck.appendChild(el);
+  });
+
+  /* ---------- Audio : musique ---------- */
+  var audio = document.getElementById("music");
+  var playBtn = document.getElementById("play");
+  var muteBtn = document.getElementById("mute");
+  var volEl = document.getElementById("vol");
+  var seekEl = document.getElementById("seek");
+  var timeEl = document.getElementById("time");
+  var player = document.getElementById("player");
+  var vol = 0.5, muted = false, seeking = false;
+
+  try { var sv = parseFloat(localStorage.getItem("sm-vol")); if (!isNaN(sv)) vol = Math.min(1, Math.max(0, sv)); } catch (e) {}
+
+  var ICON = {
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5.5" y="4" width="4.5" height="16" rx="1"/><rect x="14" y="4" width="4.5" height="16" rx="1"/></svg>',
+    high: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>',
+    low: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/></svg>',
+    off: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>'
+  };
+
+  function fmt(s) { if (!isFinite(s)) s = 0; var m = Math.floor(s / 60), r = Math.floor(s % 60); return m + ":" + (r < 10 ? "0" : "") + r; }
+  function setFill(el, pct) { el.style.setProperty("--p", pct + "%"); }
+
+  function renderVolume() {
+    audio.volume = vol;
+    audio.muted = muted;
+    var off = muted || vol === 0;
+    volEl.value = Math.round((muted ? 0 : vol) * 100);
+    setFill(volEl, volEl.value);
+    muteBtn.innerHTML = off ? ICON.off : (vol < 0.5 ? ICON.low : ICON.high);
+    muteBtn.setAttribute("aria-label", off ? "Rétablir le son" : "Couper le son");
+    updateSfxLevel();
+  }
+  function renderPlay() {
+    var on = !audio.paused;
+    playBtn.innerHTML = on ? ICON.pause : ICON.play;
+    playBtn.setAttribute("aria-label", on ? "Pause" : "Lecture");
+    player.classList.toggle("playing", on);
+  }
+  function startMusic() {
+    var p = audio.play();
+    if (p && p.then) { return p.then(renderPlay, renderPlay); }
+    renderPlay();
+    return Promise.resolve();
+  }
+
+  playBtn.addEventListener("click", function () { if (audio.paused) { startMusic(); } else { audio.pause(); } });
+  muteBtn.addEventListener("click", function () {
+    if (muted || vol === 0) { muted = false; if (vol === 0) vol = 0.4; } else { muted = true; }
+    renderVolume();
+  });
+  volEl.addEventListener("input", function () {
+    vol = volEl.value / 100; muted = false;
+    try { localStorage.setItem("sm-vol", String(vol)); } catch (e) {}
+    renderVolume();
+  });
+  audio.addEventListener("play", renderPlay);
+  audio.addEventListener("pause", renderPlay);
+  audio.addEventListener("loadedmetadata", updateTime);
+  audio.addEventListener("timeupdate", updateTime);
+  audio.addEventListener("error", function () { document.getElementById("artist").textContent = "Musique indisponible"; });
+  seekEl.addEventListener("input", function () {
+    seeking = true;
+    if (audio.duration) audio.currentTime = (seekEl.value / 1000) * audio.duration;
+    setFill(seekEl, seekEl.value / 10);
+    seeking = false;
+  });
+  function updateTime() {
+    var d = audio.duration || 0, t = audio.currentTime || 0;
+    timeEl.textContent = fmt(t) + " / " + fmt(d);
+    if (!seeking && d) { var v = (t / d) * 1000; seekEl.value = v; setFill(seekEl, v / 10); }
+  }
+
+  /* ---------- Audio : coup de revolver (synthèse, aucun fichier) ---------- */
+  var ctx = null, sfxGain = null, noiseBuf = null, wet = null, sfxLevel = 0;
+  function updateSfxLevel() {
+    var off = muted || vol === 0;
+    sfxLevel = off ? 0 : 0.35 + 0.65 * vol;
+    if (sfxGain) sfxGain.gain.value = sfxLevel;
+  }
+  function ensureCtx() {
+    if (ctx) return ctx;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    try {
+      ctx = new AC();
+      var sr = ctx.sampleRate;
+      noiseBuf = ctx.createBuffer(1, sr * 2, sr);
+      var d = noiseBuf.getChannelData(0);
+      for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      var ir = ctx.createBuffer(2, Math.floor(sr * 1.3), sr);
+      for (var ch = 0; ch < 2; ch++) {
+        var id = ir.getChannelData(ch);
+        for (var k = 0; k < id.length; k++) id[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / id.length, 3.2);
+      }
+      var conv = ctx.createConvolver(); conv.buffer = ir;
+      wet = ctx.createGain(); wet.gain.value = 0.55;
+      var comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -10; comp.ratio.value = 8; comp.attack.value = 0.001; comp.release.value = 0.2;
+      sfxGain = ctx.createGain();
+      sfxGain.gain.value = sfxLevel;
+      conv.connect(wet); wet.connect(comp);
+      sfxGain.connect(comp); comp.connect(ctx.destination);
+      ctx._conv = conv;
+    } catch (e) { ctx = null; }
+    return ctx;
+  }
+  function envelope(g, t, peak, attack, decay) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + attack + decay);
+  }
+  function noise(t, dur, type, f0, f1, peak, decay, reverbSend) {
+    var s = ctx.createBufferSource(); s.buffer = noiseBuf;
+    var f = ctx.createBiquadFilter(); f.type = type;
+    f.frequency.setValueAtTime(f0, t);
+    if (f1) f.frequency.exponentialRampToValueAtTime(f1, t + decay);
+    var g = ctx.createGain(); envelope(g, t, peak, 0.002, decay);
+    s.connect(f); f.connect(g); g.connect(sfxGain);
+    if (reverbSend) g.connect(ctx._conv);
+    s.start(t, Math.random() * 1.2, dur); s.stop(t + dur);
+  }
+  function playShot() {
+    var c = ensureCtx();
+    if (!c || sfxLevel === 0) return;
+    if (c.state === "suspended") c.resume();
+    var t = c.currentTime + 0.01;
+    /* chien du revolver : deux clics métalliques */
+    noise(t, 0.04, "bandpass", 3200, 0, 0.5, 0.02, false);
+    var o = c.createOscillator(), og = c.createGain();
+    o.type = "square"; o.frequency.setValueAtTime(1500, t); o.frequency.exponentialRampToValueAtTime(600, t + 0.03);
+    envelope(og, t, 0.12, 0.001, 0.035); o.connect(og); og.connect(sfxGain); o.start(t); o.stop(t + 0.05);
+    /* détonation */
+    var T = t + 0.075;
+    noise(T, 0.12, "highpass", 1400, 0, 1.0, 0.07, true);              /* claquement sec */
+    noise(T, 0.7, "lowpass", 3200, 260, 0.9, 0.55, true);              /* souffle */
+    var b = c.createOscillator(), bg = c.createGain();                 /* coup sourd */
+    b.type = "sine"; b.frequency.setValueAtTime(190, T); b.frequency.exponentialRampToValueAtTime(34, T + 0.28);
+    envelope(bg, T, 1.1, 0.002, 0.32); b.connect(bg); bg.connect(sfxGain); bg.connect(ctx._conv);
+    b.start(T); b.stop(T + 0.4);
+    /* ricochet métallique léger */
+    var r = c.createOscillator(), rg = c.createGain();
+    r.type = "sine"; r.frequency.setValueAtTime(2100 + Math.random() * 500, T + 0.09); r.frequency.exponentialRampToValueAtTime(1400, T + 0.5);
+    envelope(rg, T + 0.09, 0.05, 0.002, 0.4); r.connect(rg); rg.connect(sfxGain); r.start(T + 0.09); r.stop(T + 0.55);
+  }
+
+  /* ---------- Impact de balle ---------- */
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var flashEl = document.getElementById("flash");
+
+  function holeSVG() {
+    var n = 8 + Math.floor(Math.random() * 5), c = 46, out = "", i;
+    for (i = 0; i < n; i++) {
+      var a = (i / n) * Math.PI * 2 + (Math.random() - .5) * .55;
+      var len = 14 + Math.random() * 28, r0 = 6;
+      var x1 = c + Math.cos(a) * r0, y1 = c + Math.sin(a) * r0;
+      var xm = c + Math.cos(a + (Math.random() - .5) * .25) * (r0 + len * .55), ym = c + Math.sin(a + (Math.random() - .5) * .25) * (r0 + len * .55);
+      var x2 = c + Math.cos(a + (Math.random() - .5) * .35) * (r0 + len), y2 = c + Math.sin(a + (Math.random() - .5) * .35) * (r0 + len);
+      var pts = x1.toFixed(1) + "," + y1.toFixed(1) + " " + xm.toFixed(1) + "," + ym.toFixed(1) + " " + x2.toFixed(1) + "," + y2.toFixed(1);
+      out += '<polyline points="' + pts + '" stroke="#000" stroke-opacity=".7" stroke-width="2.2" fill="none"/>' +
+             '<polyline points="' + pts + '" stroke="#e4ded2" stroke-opacity=".5" stroke-width=".9" fill="none"/>';
+    }
+    for (i = 0; i < 6; i++) {
+      var da = Math.random() * 6.283, dr = 10 + Math.random() * 16;
+      out += '<circle cx="' + (c + Math.cos(da) * dr).toFixed(1) + '" cy="' + (c + Math.sin(da) * dr).toFixed(1) + '" r="' + (0.6 + Math.random() * 1.2).toFixed(1) + '" fill="#b9b2a6" fill-opacity=".55"/>';
+    }
+    return '<svg viewBox="0 0 92 92" width="92" height="92" aria-hidden="true">' +
+      '<circle cx="46" cy="46" r="17" fill="#000" fill-opacity=".35"/>' +
+      out +
+      '<circle cx="46" cy="46" r="8.6" fill="#8a867e"/>' +
+      '<circle cx="46" cy="46" r="6.4" fill="#000"/>' +
+      '<path d="M40.5 43a6.4 6.4 0 0 1 5-3.4" stroke="#fff" stroke-opacity=".35" stroke-width="1" fill="none" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+  function addHole(face, x, y) {
+    var holes = face.querySelectorAll(".hole");
+    if (holes.length >= 7) holes[0].remove();
+    var h = document.createElement("div");
+    h.className = "hole";
+    h.style.left = x + "px"; h.style.top = y + "px";
+    h.style.setProperty("--r", Math.floor(Math.random() * 360) + "deg");
+    h.innerHTML = holeSVG();
+    face.appendChild(h);
+  }
+  function sparks(face, x, y) {
+    if (reduce || !face.animate) return;
+    for (var i = 0; i < 9; i++) {
+      var s = document.createElement("i");
+      s.className = "spark";
+      s.style.left = x + "px"; s.style.top = y + "px";
+      face.appendChild(s);
+      var a = Math.random() * 6.283, d = 26 + Math.random() * 60;
+      var anim = s.animate([
+        { transform: "translate(0,0) scale(1)", opacity: 1 },
+        { transform: "translate(" + Math.cos(a) * d + "px," + (Math.sin(a) * d + 14) + "px) scale(.2)", opacity: 0 }
+      ], { duration: 330 + Math.random() * 280, easing: "cubic-bezier(.1,.7,.3,1)" });
+      anim.onfinish = (function (el) { return function () { el.remove(); }; })(s);
+    }
+  }
+  function muzzleFlash() {
+    if (reduce || !flashEl.animate) return;
+    flashEl.animate([{ opacity: 0 }, { opacity: .2 }, { opacity: 0 }], { duration: 170, easing: "ease-out" });
+  }
+
+  /* ---------- Clic sur une carte ---------- */
+  var busy = false;
+  function fire(card, clientX, clientY) {
+    if (busy) return;
+    busy = true;
+    var flipped = card.classList.contains("flipped");
+    var face = card.querySelector(flipped ? ".back" : ".front");
+    var rect = face.getBoundingClientRect();
+    var x = clientX - rect.left, y = clientY - rect.top;
+    if (flipped) x = rect.width - x;          /* la face arrière est retournée à 180° */
+    x = Math.max(24, Math.min(rect.width - 24, x));
+    y = Math.max(24, Math.min(rect.height - 24, y));
+
+    playShot();
+    setTimeout(function () {                  /* l'impact tombe avec la détonation */
+      addHole(face, x, y);
+      sparks(face, x, y);
+      muzzleFlash();
+      card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+    }, 85);
+    setTimeout(function () {
+      card.classList.toggle("flipped");
+      var open = card.classList.contains("flipped");
+      card.setAttribute("aria-expanded", open ? "true" : "false");
+      var title = card.querySelector("h2").textContent;
+      card.setAttribute("aria-label", title + (open ? " : refermer la carte" : " : ouvrir la carte"));
+    }, 560);
+    setTimeout(function () { busy = false; card.classList.remove("shake"); }, 1450);
+  }
+  deck.addEventListener("click", function (e) {
+    var card = e.target.closest(".card");
+    if (!card) return;
+    if (window.getSelection && String(window.getSelection()).length > 0) return; /* laisse copier le texte */
+    fire(card, e.clientX, e.clientY);
+  });
+  deck.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var card = e.target.closest(".card");
+    if (!card) return;
+    e.preventDefault();
+    var r = card.getBoundingClientRect();
+    fire(card, r.left + r.width * (0.3 + Math.random() * 0.4), r.top + r.height * (0.3 + Math.random() * 0.4));
+  });
+
+  /* ---------- Écran d'entrée et lancement de la musique ---------- */
+  var splash = document.getElementById("splash");
+  var enterBtn = document.getElementById("enter");
+  function leaveSplash() {
+    splash.classList.add("gone");
+    document.body.classList.remove("locked");
+  }
+  document.body.classList.add("locked");
+  enterBtn.addEventListener("click", function () {
+    ensureCtx();
+    if (ctx && ctx.state === "suspended") ctx.resume();
+    startMusic();
+    leaveSplash();
+  });
+  enterBtn.focus({ preventScroll: true });
+
+  renderVolume();
+  renderPlay();
+  updateTime();
+
+  /* Si le navigateur autorise la lecture automatique, la musique démarre dès l'ouverture. */
+  try {
+    var ap = audio.play();
+    if (ap && ap.then) ap.then(function () { renderPlay(); leaveSplash(); }, function () { /* attend le clic sur « Entrer » */ });
+  } catch (e) {}
+})();
+</script>
+
+</body>
+</html>
